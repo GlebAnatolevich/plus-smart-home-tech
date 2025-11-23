@@ -22,7 +22,8 @@ public class KafkaSnapshotProducer {
         log.info("В топик: {} отправляется снимок событий: {} для хаба: {}", snapshotsTopic, avroSnapshot,
                 avroSnapshot.getHubId());
 
-        kafkaTemplate.send(snapshotsTopic, avroSnapshot.getHubId(), avroSnapshot)
+        kafkaTemplate.send(snapshotsTopic,null,
+                        avroSnapshot.getTimestamp().toEpochMilli(), avroSnapshot.getHubId(), avroSnapshot)
                 .whenComplete((result, exception) -> {
                     if (exception == null) {
                         log.info("Событие сенсора: {} для hubId: {} успешно отправлено, смещение: {}",
