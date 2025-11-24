@@ -90,6 +90,7 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, HubEventAvro> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(hubConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
 
         log.debug("Создание hubKafkaListenerContainerFactory для чтения сообщений топиков: {}", hub.getConsumerTopics());
 
