@@ -3,6 +3,7 @@ package ru.practicum.kafka.telemetry.service;
 import ru.practicum.kafka.telemetry.model.hub.HubEvent;
 import ru.practicum.kafka.telemetry.model.sensor.SensorEvent;
 
+@SuppressWarnings("unused")
 public interface CollectorService {
     void sendSensorEvent(SensorEvent sensorEvent);
 
