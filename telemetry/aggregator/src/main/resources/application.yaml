@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: aggregator
+  config:
+    import: configserver:http://localhost:8888
+    cloud:
+      config:
+        fail-fast: true
+        retry:
+          useRandomPolicy: true
+          max-interval: 6000
