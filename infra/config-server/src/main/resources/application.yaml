@@ -1,16 +1,20 @@
+server:
+  port: 0
 spring:
   application:
     name: config-server
   profiles:
     active: native
+  output:
+    ansi:
+      enabled: always
   cloud:
     config:
       server:
         native:
           searchLocations:
             - classpath:config/telemetry/{application}
-server:
-  port: 0
+            - classpath:config/commerce/{application}
 eureka:
   client:
     serviceUrl:
