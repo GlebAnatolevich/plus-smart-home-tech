@@ -34,20 +34,74 @@ services:
                              --bootstrap-server kafka:29092'"
     init: true
 
-    db:
-      image: postgres:16.1
-      container_name: postgres-analyzer
-      environment:
-        POSTGRES_USER: analyzer
-        POSTGRES_PASSWORD: analyzer
-        POSTGRES_DB: analyzer
-      ports:
-        - "6541:5432"
-      volumes:
-        - /etc/localtime:/etc/localtime:ro
-        - /etc/timezone:/etc/timezone:ro
-      healthcheck:
-        test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
-        timeout: 5s
-        interval: 5s
-        retries: 10
+  db:
+    image: postgres:16.1
+    container_name: postgres-analyzer
+    environment:
+      POSTGRES_USER: analyzer
+      POSTGRES_PASSWORD: analyzer
+      POSTGRES_DB: analyzer
+    ports:
+      - "6541:5432"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  db2:
+    image: postgres:16.1
+    container_name: postgres-cart
+    environment:
+      POSTGRES_USER: cart
+      POSTGRES_PASSWORD: cart
+      POSTGRES_DB: cart
+    ports:
+      - "6542:5432"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  db3:
+    image: postgres:16.1
+    container_name: postgres-store
+    environment:
+      POSTGRES_USER: store
+      POSTGRES_PASSWORD: store
+      POSTGRES_DB: store
+    ports:
+      - "6543:5432"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+
+  db4:
+    image: postgres:16.1
+    container_name: postgres-warehouse
+    environment:
+      POSTGRES_USER: warehouse
+      POSTGRES_PASSWORD: warehouse
+      POSTGRES_DB: warehouse
+    ports:
+      - "6544:5432"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10

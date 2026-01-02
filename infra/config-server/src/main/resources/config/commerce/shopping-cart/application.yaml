@@ -1,0 +1,34 @@
+server:
+  port: 0
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6542/cart
+    username: cart
+    password: cart
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  jpa:
+    hibernate:
+      ddl-auto: none
+      properties:
+        hibernate.format_sql: true
+        hibernate.show_sql: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+logging:
+  level:
+    ru.practicum.shopping.cart.feign.client: DEBUG
