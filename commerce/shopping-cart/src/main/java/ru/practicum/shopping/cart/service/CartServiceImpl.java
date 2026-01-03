@@ -149,7 +149,6 @@ public class CartServiceImpl implements CartService {
         Long newQuantity = requestDto.getNewQuantity();
 
         Map<UUID, Long> products = cart.getProducts();
-
         if (products == null) {
             products = new HashMap<>();
             cart.setProducts(products);
@@ -159,17 +158,33 @@ public class CartServiceImpl implements CartService {
             throw new BadRequestException(String.format("Товар с ID %s отсутствует в корзине", productId));
         }
 
+        Long oldQuantity = products.get(productId);
+
         if (newQuantity == 0) {
             products.remove(productId);
         } else {
             products.put(productId, newQuantity);
         }
 
-        return cartMapper.toDto(cartRepository.save(cart));
+        if (newQuantity > 0) {
+            try {
+                log.info("Проверяю наличие на складе: id = {}, products = {}", cart.getShoppingCartId(), cart.getProducts());
+                BookedProductsDto response = warehouseClient.checkProductQuantityInWarehouse(cartMapper.toDto(cart));
+                log.info("Проверено наличие на складе: {}", response);
+            } catch (FeignException e) {
+                products.put(productId, oldQuantity);
+                log.error("Ошибка вызова склада при обновлении количества: {}", e.getMessage());
+                throw new RuntimeException("Склад недоступен", e);
+            }
+        }
+
+        cart = cartRepository.save(cart);
+
+        return cartMapper.toDto(cart);
     }
 
     private void checkUsername(String username) {
-        if (username == null || username.isEmpty()) {
+        if (username == null || username.isBlank()) {
             throw new NotAuthorizedUserException("Имя пользователя не должно быть пустым.");
         }
     }
