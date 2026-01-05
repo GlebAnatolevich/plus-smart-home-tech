@@ -1,0 +1,22 @@
+server:
+  port: 0
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6543/store
+    username: store
+    password: store
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+  jpa:
+    hibernate:
+      ddl-auto: none
+      properties:
+        hibernate.format_sql: true
+        hibernate.show_sql: true
