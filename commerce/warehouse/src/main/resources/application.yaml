@@ -15,6 +15,7 @@ spring:
 eureka:
   instance:
     preferIpAddress: false
+    instance-id: "${spring.application.name}:${random.value}"
   client:
     registerWithEureka: true
     serviceUrl:
