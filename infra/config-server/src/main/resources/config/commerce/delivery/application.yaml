@@ -1,0 +1,38 @@
+server:
+  port: 0
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6545/delivery
+    username: delivery
+    password: delivery
+    initialization-mode: always
+  sql:
+    init:
+      mode: always
+  jpa:
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc.time_zone: UTC
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+logging:
+  level:
+    ru.practicum.delivery.feign.client: DEBUG

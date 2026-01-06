@@ -6,25 +6,58 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.interaction.api.exception.BadRequestException;
+import ru.practicum.interaction.api.exception.CartOperationFailedException;
+import ru.practicum.interaction.api.exception.DeliveryOperationFailedException;
+import ru.practicum.interaction.api.exception.NoCartFoundException;
+import ru.practicum.interaction.api.exception.NoDeliveryFoundException;
+import ru.practicum.interaction.api.exception.NoOrderFoundException;
+import ru.practicum.interaction.api.exception.NoPaymentFoundException;
 import ru.practicum.interaction.api.exception.NoSpecifiedProductInWarehouseException;
 import ru.practicum.interaction.api.exception.NotAuthorizedUserException;
+import ru.practicum.interaction.api.exception.NotEnoughInfoInOrderToCalculateException;
 import ru.practicum.interaction.api.exception.NotFoundException;
+import ru.practicum.interaction.api.exception.OrderOperationFailedException;
+import ru.practicum.interaction.api.exception.PaymentOperationFailedException;
 import ru.practicum.interaction.api.exception.ProductNotFoundException;
 import ru.practicum.interaction.api.exception.SpecifiedProductAlreadyInWarehouseException;
+import ru.practicum.interaction.api.exception.StoreOperationFailedException;
+import ru.practicum.interaction.api.exception.WarehouseOperationFailedException;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
+    private static final Map<Class<? extends Exception>, String> NOT_FOUND_MESSAGES = new HashMap<>();
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ApiError> handleProductNotFoundException(Exception ex) {
-        log.warn("Выброшено исключение ProductNotFoundException");
+    static {
+        NOT_FOUND_MESSAGES.put(ProductNotFoundException.class, "Товар не найден. Пожалуйста, проверьте запрос.");
+        NOT_FOUND_MESSAGES.put(NoPaymentFoundException.class, "Платёж не найден. Пожалуйста, проверьте запрос.");
+        NOT_FOUND_MESSAGES.put(NoDeliveryFoundException.class, "Информация по доставке не найдена. Пожалуйста, проверьте запрос.");
+        NOT_FOUND_MESSAGES.put(NoCartFoundException.class, "Корзина не найдена. Пожалуйста, проверьте запрос.");
+        NOT_FOUND_MESSAGES.put(NoOrderFoundException.class, "Заказ не найден. Пожалуйста, проверьте запрос.");
+        NOT_FOUND_MESSAGES.put(NotFoundException.class, "Объект не найден. Пожалуйста, проверьте запрос.");
+    }
 
-        ApiError response = createResponse(ex, "Товар не найден. Пожалуйста, проверьте запрос.");
+    @ExceptionHandler({
+            ProductNotFoundException.class,
+            NoPaymentFoundException.class,
+            NoDeliveryFoundException.class,
+            NoCartFoundException.class,
+            NoOrderFoundException.class,
+            NotFoundException.class
+    })
+
+    public ResponseEntity<ApiError> handleNotFoundExceptions(Exception ex) {
+        String errorMessage = NOT_FOUND_MESSAGES.get(ex.getClass());
+
+        log.warn("Выброшено исключение {}: {}", ex.getClass().getSimpleName(), errorMessage);
+
+        ApiError response = createResponse(ex, errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
@@ -38,38 +71,49 @@ public class ErrorHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFoundException(Exception ex) {
-        log.warn("Выброшено исключение NotFoundException");
+    private static final Map<Class<? extends Exception>, String> BAD_REQUEST_MESSAGES = new HashMap<>();
 
-        ApiError response = createResponse(ex, "Ресурс не найден.");
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    static {
+        BAD_REQUEST_MESSAGES.put(SpecifiedProductAlreadyInWarehouseException.class,
+                "Ошибка, товар с таким описанием уже зарегистрирован на складе");
+        BAD_REQUEST_MESSAGES.put(NoSpecifiedProductInWarehouseException.class,
+                "Нет информации о товаре на складе");
+        BAD_REQUEST_MESSAGES.put(BadRequestException.class,
+                "Некорректный запрос.");
+        BAD_REQUEST_MESSAGES.put(WarehouseOperationFailedException.class,
+                "Ошибка работы с feign client: warehouse");
+        BAD_REQUEST_MESSAGES.put(CartOperationFailedException.class,
+                "Ошибка работы с feign client: shopping - cart.");
+        BAD_REQUEST_MESSAGES.put(PaymentOperationFailedException.class,
+                "Ошибка работы с feign client: payment.");
+        BAD_REQUEST_MESSAGES.put(DeliveryOperationFailedException.class,
+                "Ошибка работы с feign client: delivery.");
+        BAD_REQUEST_MESSAGES.put(StoreOperationFailedException.class,
+                "Ошибка работы с feign client: store.");
+        BAD_REQUEST_MESSAGES.put(OrderOperationFailedException.class,
+                "Ошибка работы с feign client: order");
+        BAD_REQUEST_MESSAGES.put(NotEnoughInfoInOrderToCalculateException.class,
+                "Недостаточно информации в заказе для расчёта");
     }
 
-    @ExceptionHandler(SpecifiedProductAlreadyInWarehouseException.class)
-    public ResponseEntity<ApiError> handleSpecifiedProductAlreadyInWarehouseException(Exception ex) {
-        log.warn("Выброшено исключение SpecifiedProductAlreadyInWarehouseException");
+    @ExceptionHandler({
+            SpecifiedProductAlreadyInWarehouseException.class,
+            NoSpecifiedProductInWarehouseException.class,
+            BadRequestException.class,
+            WarehouseOperationFailedException.class,
+            CartOperationFailedException.class,
+            PaymentOperationFailedException.class,
+            DeliveryOperationFailedException.class,
+            StoreOperationFailedException.class,
+            OrderOperationFailedException.class,
+            NotEnoughInfoInOrderToCalculateException.class
+    })
+    public ResponseEntity<ApiError> handleBadRequestExceptions(Exception ex) {
+        String errorMessage = BAD_REQUEST_MESSAGES.get(ex.getClass());
 
-        ApiError response = createResponse(ex, "Ошибка, товар с таким описанием уже зарегистрирован на складе");
+        log.warn("Выброшено исключение {}: {}", ex.getClass().getSimpleName(), errorMessage);
 
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NoSpecifiedProductInWarehouseException.class)
-    public ResponseEntity<ApiError> handleNoSpecifiedProductInWarehouseException(Exception ex) {
-        log.warn("Выброшено исключение NoSpecifiedProductInWarehouseException");
-
-        ApiError response = createResponse(ex, "Нет информации о товаре на складе");
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiError> handleBadRequestException(Exception ex) {
-        log.warn("Выброшено исключение BadRequestException");
-
-        ApiError response = createResponse(ex, "Некорректный запрос.");
+        ApiError response = createResponse(ex, errorMessage);
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
@@ -79,7 +123,7 @@ public class ErrorHandler {
                 .message(ex.getMessage())
                 .localizedMessage(ex.getLocalizedMessage())
                 .userMessage(message)
-                .httpStatus(HttpStatus.NOT_FOUND.toString())
+                .httpStatus(HttpStatus.BAD_REQUEST.toString())
                 .stackTrace(convertStackTrace(ex.getStackTrace()))
                 .build();
 

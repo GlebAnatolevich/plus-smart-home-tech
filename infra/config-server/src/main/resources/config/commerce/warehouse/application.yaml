@@ -31,4 +31,4 @@ feign:
 
 logging:
   level:
-    ru.practicum.shopping.cart.feign.client: DEBUG
+    ru.practicum.warehouse.feign.client: DEBUG

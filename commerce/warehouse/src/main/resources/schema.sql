@@ -5,10 +5,10 @@ CREATE TABLE IF NOT EXISTS product_storage (
 
     fragile BOOLEAN,
 
-    width DOUBLE PRECISION NOT NULL,
-    height DOUBLE PRECISION NOT NULL,
-    depth DOUBLE PRECISION NOT NULL,
+    width DECIMAL(10, 3) NOT NULL,
+    height DECIMAL(10, 3) NOT NULL,
+    depth DECIMAL(10, 3) NOT NULL,
 
-    weight DOUBLE PRECISION NOT NULL,
+    weight DECIMAL(10, 3) NOT NULL,
     quantity BIGINT NOT NULL DEFAULT 0
 );

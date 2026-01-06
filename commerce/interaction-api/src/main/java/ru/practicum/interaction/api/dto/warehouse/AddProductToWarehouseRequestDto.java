@@ -21,6 +21,6 @@ public class AddProductToWarehouseRequestDto {
     UUID productId;
 
     @NotNull(message = "Необходимо указать количество")
-    @Min(value = 1, message = "Минимальное количество равно 1")
+    @Min(value = 1, message = "Значение должно быть не менее 1")
     Long quantity;
 }

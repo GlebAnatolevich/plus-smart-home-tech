@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.interaction.api.dto.warehouse.DimensionDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -35,8 +36,8 @@ public class ProductStorage {
     @Embedded
     DimensionDto dimensionDto;
 
-    @Column(name = "weight", nullable = false)
-    Double weight;
+    @Column(name = "weight", nullable = false, precision = 10, scale = 3)
+    BigDecimal weight;
 
     @Column(name = "quantity")
     Long quantity = 0L;
