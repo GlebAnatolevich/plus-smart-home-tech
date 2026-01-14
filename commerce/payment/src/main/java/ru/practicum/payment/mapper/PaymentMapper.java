@@ -1,8 +1,6 @@
 package ru.practicum.payment.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import ru.practicum.interaction.api.dto.order.OrderDto;
 import ru.practicum.interaction.api.dto.payment.PaymentDto;
 import ru.practicum.interaction.api.utility.AppConstants;
@@ -18,11 +16,14 @@ public interface PaymentMapper {
     @Mapping(target = "totalPayment", source = "totalPrice")
     @Mapping(target = "deliveryTotal", source = "deliveryPrice")
     @Mapping(target = "orderId", source = "orderId")
-    @Mapping(
-            target = "feeTotal",
-            // -- если цена не null, умножаем ее на NDS_RATE, иначе ставим 0
-            expression = "java(orderDto.getProductPrice() != null " +
-                         "? orderDto.getProductPrice().multiply(AppConstants.NDS_RATE) : java.math.BigDecimal.ZERO)"
-    )
     Payment toPayment(OrderDto orderDto);
+
+    @AfterMapping
+    default void fillFeeTotal(OrderDto orderDto, @MappingTarget Payment payment) {
+        if (orderDto.getProductPrice() != null) {
+            payment.setFeeTotal(orderDto.getProductPrice().multiply(AppConstants.NDS_RATE));
+        } else {
+            payment.setFeeTotal(java.math.BigDecimal.ZERO);
+        }
+    }
 }
