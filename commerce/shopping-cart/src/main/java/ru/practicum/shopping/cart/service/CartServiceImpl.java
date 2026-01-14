@@ -1,17 +1,20 @@
 package ru.practicum.shopping.cart.service;
 
 import feign.FeignException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.interaction.api.dto.cart.ChangeProductQuantityRequestDto;
 import ru.practicum.interaction.api.dto.cart.ShoppingCartDto;
 import ru.practicum.interaction.api.dto.warehouse.BookedProductsDto;
 import ru.practicum.interaction.api.enums.cart.CartState;
 import ru.practicum.interaction.api.exception.BadRequestException;
+import ru.practicum.interaction.api.exception.NoCartFoundException;
 import ru.practicum.interaction.api.exception.NotAuthorizedUserException;
 import ru.practicum.interaction.api.exception.NotFoundException;
 import ru.practicum.shopping.cart.feign.client.WarehouseClient;
@@ -28,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Transactional
+@Validated
 @Slf4j
 public class CartServiceImpl implements CartService {
     CartRepository cartRepository;
@@ -136,7 +140,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ShoppingCartDto updateProductQuantity(String username, ChangeProductQuantityRequestDto requestDto) {
+    public ShoppingCartDto updateProductQuantity(String username, @Valid ChangeProductQuantityRequestDto requestDto) {
         checkUsername(username);
 
         if (requestDto == null) throw new BadRequestException("Запрос на обновление не может быть null");
@@ -169,11 +173,15 @@ public class CartServiceImpl implements CartService {
         if (newQuantity > 0) {
             try {
                 log.info("Проверяю наличие на складе: id = {}, products = {}", cart.getShoppingCartId(), cart.getProducts());
+
                 BookedProductsDto response = warehouseClient.checkProductQuantityInWarehouse(cartMapper.toDto(cart));
+
                 log.info("Проверено наличие на складе: {}", response);
             } catch (FeignException e) {
                 products.put(productId, oldQuantity);
+
                 log.error("Ошибка вызова склада при обновлении количества: {}", e.getMessage());
+
                 throw new RuntimeException("Склад недоступен", e);
             }
         }
@@ -181,6 +189,13 @@ public class CartServiceImpl implements CartService {
         cart = cartRepository.save(cart);
 
         return cartMapper.toDto(cart);
+    }
+
+    @Override
+    public String getUsernameById(UUID cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new NoCartFoundException("Корзина с таким ID не существует: {}" + cartId));
+        return cart.getUsername();
     }
 
     private void checkUsername(String username) {

@@ -10,7 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import ru.practicum.interaction.api.enums.store.ProductCategory;
 import ru.practicum.interaction.api.enums.store.ProductState;
 import ru.practicum.interaction.api.enums.store.QuantityState;
@@ -27,14 +26,14 @@ public class ProductDto {
     UUID productId;
 
     @NotBlank(message = "Наименование товара не может быть пустым")
-    @Size(max = 255, message = "Наименование товара должно содержать до 255 символов")
+    @Size(max = 255, message = "Наименование товара должно быть до 255 символов")
     String productName;
 
     @NotBlank(message = "Описание товара не может быть пустым")
-    @Size(max = 255, message = "Описание товара должно содержать до 255 символов")
+    @Size(max = 255, message = "Описание товара должно быть до 255 символов")
     String description;
 
-    @Size(max = 255, message = "Ссылка на картинку должна содержать до 255 символов")
+    @Size(max = 255, message = "Ссылка на изображение должна быть до 255 символов")
     String imageSrc;
 
     @NotNull(message = "Необходимо указать остаток товара")

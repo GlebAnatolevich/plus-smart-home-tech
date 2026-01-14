@@ -1,6 +1,8 @@
 package ru.practicum.interaction.api.dto.cart;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +22,9 @@ public class ShoppingCartDto {
     @NotNull
     UUID shoppingCartId;
 
-    @NotNull(message = "Необходимо указать идентификатор товара и его количество")
-    Map<UUID, Long> products;
+    @NotNull(message = "Список продуктов не может быть null")
+    @NotEmpty(message = "Список продуктов не может быть пустым")
+    Map<@NotNull(message = "ID продукта не может быть null") UUID,
+            @NotNull(message = "Количество не может быть null")
+            @Positive(message = "Количество должно быть положительным") Long> products;
 }

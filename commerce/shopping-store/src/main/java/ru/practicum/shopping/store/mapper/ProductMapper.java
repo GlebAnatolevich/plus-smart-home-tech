@@ -28,4 +28,6 @@ public interface ProductMapper {
 
     @Mapping(target = "productId", ignore = true)
     void updateFromDto(ProductDto dto, @MappingTarget Product entity);
+
+    List<ProductDto> toDtoList(List<Product> entities);
 }

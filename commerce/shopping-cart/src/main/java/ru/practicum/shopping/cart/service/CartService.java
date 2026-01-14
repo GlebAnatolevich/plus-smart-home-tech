@@ -1,5 +1,6 @@
 package ru.practicum.shopping.cart.service;
 
+import jakarta.validation.Valid;
 import ru.practicum.interaction.api.dto.cart.ChangeProductQuantityRequestDto;
 import ru.practicum.interaction.api.dto.cart.ShoppingCartDto;
 
@@ -16,5 +17,7 @@ public interface CartService {
 
     ShoppingCartDto deleteProduct(String username, Set<UUID> request);
 
-    ShoppingCartDto updateProductQuantity(String username, ChangeProductQuantityRequestDto requestDto);
+    ShoppingCartDto updateProductQuantity(String username, @Valid ChangeProductQuantityRequestDto requestDto);
+
+    String getUsernameById(UUID cartId);
 }

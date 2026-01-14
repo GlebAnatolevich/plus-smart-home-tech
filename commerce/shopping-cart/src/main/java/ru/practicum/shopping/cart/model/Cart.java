@@ -48,6 +48,6 @@ public class Cart {
     @Column(name = "status", nullable = false, length = 20)
     CartState status = CartState.ACTIVE;
 
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     String username;
 }
