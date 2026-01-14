@@ -16,6 +16,7 @@ public interface PaymentMapper {
     @Mapping(target = "totalPayment", source = "totalPrice")
     @Mapping(target = "deliveryTotal", source = "deliveryPrice")
     @Mapping(target = "orderId", source = "orderId")
+    @Mapping(target = "feeTotal", ignore = true)
     Payment toPayment(OrderDto orderDto);
 
     @AfterMapping
